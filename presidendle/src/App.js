@@ -13,8 +13,14 @@ function App() {
   }));
   const defaultOption = {value: '', label: 'Type or select a president\'s name'};
   const [selectedOptions, setSelectedOptions] = useState([]);
+  const [guesses, setGuesses] = useState(5);
     
   const handleOptionChange = (selectedOption) => {
+    if (guesses === 0) {
+      console.log("No guesses left")
+      return;
+    }
+    setGuesses(guesses - 1);
     console.log(selectedOption)
     setSelectedOptions([...selectedOptions, selectedOption]);
   };
