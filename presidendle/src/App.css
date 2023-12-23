@@ -3,14 +3,16 @@ h1, h3 {
 }
 
 .select {
-  width: 33%;
+  width: 45%;
 }
 
-.image, .text-field {
+.image, .container {
   display: flex;
+  flex-direction: column;
   justify-content: center;
+  align-items: center;
 }
 
-.text-field {
+.container {
   margin-top: 2%;
 }

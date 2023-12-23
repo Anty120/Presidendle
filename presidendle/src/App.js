@@ -12,9 +12,11 @@ function App() {
     label: president.name,
   }));
   const defaultOption = {value: '', label: 'Type or select a president\'s name'};
+  const [selectedOptions, setSelectedOptions] = useState([]);
     
   const handleOptionChange = (selectedOption) => {
     console.log(selectedOption)
+    setSelectedOptions([...selectedOptions, selectedOption]);
   };
  
   const fetchData = useCallback(async () => {
@@ -35,12 +37,12 @@ function App() {
   }, []);
  
   const getRandomPresident = (presidentsArray) => {
-  const randomIndex = Math.floor(Math.random() * presidentsArray.length);
-  return presidentsArray[randomIndex];
+    const randomIndex = Math.floor(Math.random() * presidentsArray.length);
+    return presidentsArray[randomIndex];
   };
  
   useEffect(() => {
-  fetchData();
+    fetchData();
   }, [fetchData]);
 
 return (
@@ -53,7 +55,8 @@ return (
           <img src={selectedPresident.photo} alt="" onLoad={() => setIsImageLoaded(true)}/>
         </div>
         {isImageLoaded && (
-          <div className='text-field'>
+          <>
+          <div className='container'>
             <Select
               options={options}
               value={defaultOption}
@@ -62,6 +65,12 @@ return (
               className='select'
             />
           </div>
+          <div className='container'>
+            {selectedOptions.map((option, index) => (
+              <div key={index}>{option.label}</div>
+            ))}
+          </div>
+          </>
         )}
       </>
     ) : (
