@@ -66,6 +66,6 @@ h1, h3 {
     button {
         width: 50%;
         border-radius: 5%;
-        
+        margin-top: 4;
     }
 }

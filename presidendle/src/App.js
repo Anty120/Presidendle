@@ -12,7 +12,7 @@ function App() {
     const [isImageLoaded, setIsImageLoaded] = useState(false);
     const [selectedOptions, setSelectedOptions] = useState([]);
     const [guesses, setGuesses] = useState(5);
-    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const [successModalIsOpen, setSuccessModalIsOpen] = useState(false);
 
     const options = presidents.map((president) => ({
         value: president.id,
@@ -21,12 +21,14 @@ function App() {
 
     const defaultOption = { value: '', label: 'Type or select a president\'s name' };
 
-    const openModal = () => {
-        setModalIsOpen(true);
+    ReactModal.setAppElement('#root');
+
+    const openSuccessModal = () => {
+        setSuccessModalIsOpen(true);
     };
 
     const closeModal = () => {
-        setModalIsOpen(false);
+        setSuccessModalIsOpen(false);
     };
     const handleOptionChange = (selectedOption) => {
         if (guesses === 0) {
@@ -37,7 +39,7 @@ function App() {
         setGuesses(guesses - 1);
 
         if (selectedOption.value === selectedPresident.id) {
-            openModal()
+            openSuccessModal()
         } else {
             console.log(selectedOption)
             const arrow = selectedOption.value < selectedPresident.id ? <FaArrowDown /> : <FaArrowUp />;
@@ -52,8 +54,8 @@ function App() {
             setIsLoading(true); // Set loading state to true at the start of fetch
             const response = await fetch('https://api.sampleapis.com/presidents/presidents');
             const presidentsArray = await response.json();
-            
-            const filteredPresidentsArray = presidentsArray.filter((_, index) => index !== 1); //cannot have two because the link for the picture is broken and not 22 because there is no description for Chester A. Arthur
+
+            const filteredPresidentsArray = presidentsArray.filter((_, index) => index !== 1 && index !== 20 && index !== 40 && index !== 25); //I got rid of some indexes, due to missing data from APIs. Currently, John Adams, Chester Arthur, Theodore Roosevelt, and George H. W. Bush are ommitted for that reason.
             console.log(filteredPresidentsArray)
             setPresidents(filteredPresidentsArray);
             setSelectedPresident(getRandomPresident(filteredPresidentsArray));
@@ -110,14 +112,15 @@ function App() {
                             </>
                         )} {/* <- isImageLoaded */}
                         <ReactModal
-                            isOpen={modalIsOpen}
+                            isOpen={successModalIsOpen}
                             onRequestClose={closeModal}
+                            shouldCloseOnOverlayClick={false}
                             contentLabel="Modal"
-                            className={"modal"}
+                            className="modal"
                         >
                             <h2>You Guessed Correctly!</h2>
                             <p>{findPresident(selectedPresident.name).description}</p>
-                            <button onClick={closeModal}>New Game {'>'}</button>
+                            <button onClick={() => { closeModal(); fetchData(); setSelectedOptions([]) }}>New Game {'>'}</button>
                         </ReactModal>
                     </>
                 ) : ( // <- isLoading
@@ -125,7 +128,7 @@ function App() {
                 )}
             </div>
 
-            <button onClick={openModal}>Open Modal</button>
+            <button onClick={openSuccessModal}>Open Modal</button>
         </>
     );
 }
