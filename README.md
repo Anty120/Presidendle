@@ -1,2 +1,2 @@
 # Presidendle
-Wordle Clone But For President's Country!
+Wordle Clone / Guessing Game But For U.S Presidents
