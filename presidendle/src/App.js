@@ -13,6 +13,7 @@ function App() {
     const [selectedOptions, setSelectedOptions] = useState([]);
     const [guesses, setGuesses] = useState(5);
     const [successModalIsOpen, setSuccessModalIsOpen] = useState(false);
+    const [loseModalIsOpen, setLoseModalIsOpen] = useState(false);
 
     const options = presidents.map((president) => ({
         value: president.id,
@@ -27,12 +28,21 @@ function App() {
         setSuccessModalIsOpen(true);
     };
 
+    const openLoseModal = () => {
+        setLoseModalIsOpen(true);
+    };
+
     const closeModal = () => {
         setSuccessModalIsOpen(false);
+        setLoseModalIsOpen(false);
     };
     const handleOptionChange = (selectedOption) => {
-        if (guesses === 0) {
-            console.log("SHOULD TRIGGER LOSE MODAL NOW")
+        if (guesses === 1) {
+            const arrow = selectedOption.value < selectedPresident.id ? <FaArrowDown /> : <FaArrowUp />;
+            setSelectedOptions([...selectedOptions,
+            { label: selectedOption.label, arrow: arrow, value: selectedOption.value }
+            ]);
+            openLoseModal();
             return;
         }
 
@@ -55,7 +65,8 @@ function App() {
             const response = await fetch('https://api.sampleapis.com/presidents/presidents');
             const presidentsArray = await response.json();
 
-            const filteredPresidentsArray = presidentsArray.filter((_, index) => index !== 1 && index !== 20 && index !== 40 && index !== 25); //I got rid of some indexes, due to missing data from APIs. Currently, John Adams, Chester Arthur, Theodore Roosevelt, and George H. W. Bush are ommitted for that reason.
+            const filteredPresidentsArray = presidentsArray.filter((_, index) => index !== 1 && index !== 20 && index !== 40 && index !== 25 && index !== 11);
+            //I got rid of some indexes, due to missing data from the APIs. Currently, John Adams, Chester Arthur, Theodore Roosevelt, Zachary Taylor, and George H. W. Bush are ommitted for that reason.
             console.log(filteredPresidentsArray)
             setPresidents(filteredPresidentsArray);
             setSelectedPresident(getRandomPresident(filteredPresidentsArray));
@@ -89,6 +100,7 @@ function App() {
                         </div>
                         {isImageLoaded && (
                             <>
+                                <h4 className='guesses'>Guess Left: {guesses}</h4>
                                 <div className='container'>
                                     <Select
                                         options={options}
@@ -111,24 +123,38 @@ function App() {
                                 </div>
                             </>
                         )} {/* <- isImageLoaded */}
+
+                        {/* Success Modal */}
                         <ReactModal
                             isOpen={successModalIsOpen}
                             onRequestClose={closeModal}
                             shouldCloseOnOverlayClick={false}
                             contentLabel="Modal"
-                            className="modal"
+                            className="success-modal"
                         >
                             <h2>You Guessed Correctly!</h2>
                             <p>{findPresident(selectedPresident.name).description}</p>
-                            <button onClick={() => { closeModal(); fetchData(); setSelectedOptions([]) }}>New Game {'>'}</button>
+                            <button onClick={() => { closeModal(); fetchData(); setSelectedOptions([]); setGuesses(5) }}>New Game {'>'}</button>
+                        </ReactModal>
+
+                        {/* Lose Modal */}
+                        <ReactModal
+                            isOpen={loseModalIsOpen}
+                            onRequestClose={closeModal}
+                            shouldCloseOnOverlayClick={false}
+                            contentLabel="Modal"
+                            className="lose-modal"
+                        >
+                            <h2>You Ran Out Of Guesses!</h2>
+                            <h3>The Correct Answer Was: {selectedPresident.name}</h3>
+                            <p>{findPresident(selectedPresident.name).description}</p>
+                            <button onClick={() => { closeModal(); fetchData(); setSelectedOptions([]); setGuesses(5) }}>Try Again {'>'}</button>
                         </ReactModal>
                     </>
                 ) : ( // <- isLoading
                     <p>Unable to Access Data ERROR</p>
                 )}
             </div>
-
-            <button onClick={openSuccessModal}>Open Modal</button>
         </>
     );
 }
